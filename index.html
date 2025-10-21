@@ -1,105 +1,140 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rahman SMM Panel</title>
   <style>
     body {
       font-family: "Poppins", sans-serif;
-      background: linear-gradient(to bottom, #f9f9ff, #e3f2fd);
-      color: #222;
-      margin: 0;
-      padding: 0;
+      background: linear-gradient(to bottom, #ffffff, #e6f0ff);
       text-align: center;
-    }
-    header {
-      background: #1976d2;
-      color: white;
-      padding: 15px 0;
-      font-size: 1.5em;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-    .container {
-      margin: 25px auto;
-      max-width: 400px;
-      background: white;
       padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      color: #222;
     }
-    input, select, button {
+    h1 {
+      background: #007bff;
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-top: 20px;
+      display: inline-block;
+      text-align: left;
+      width: 90%;
+      max-width: 400px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+    input, select {
       width: 100%;
-      margin: 8px 0;
       padding: 10px;
-      border-radius: 8px;
       border: 1px solid #ccc;
-      font-size: 1em;
+      border-radius: 8px;
     }
     button {
-      background: #1976d2;
+      width: 100%;
+      background: #007bff;
       color: white;
       border: none;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
     }
     button:hover {
-      background: #1565c0;
+      background: #005fcc;
     }
-    .msg {
-      margin-top: 10px;
-      color: #0d47a1;
+    .result {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #007bff;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <header>Rahman SMM Panel 💙</header>
+  <h1>Rahman SMM Panel 💙</h1>
+  
+  <div class="card">
+    <label for="service">Pilih Layanan</label>
+    <select id="service" onchange="updatePrice()">
+      <option value="subscribers">YouTube Subscribers</option>
+      <option value="views">YouTube Views</option>
+      <option value="watchtime">YouTube Watch Time (Jam Tayang)</option>
+      <option value="instagram">Instagram Followers</option>
+      <option value="tiktok">TikTok Followers</option>
+    </select>
 
-  <div class="container">
-    <h3>Top Up Saldo</h3>
-    <button onclick="topup()">+ Rp10.000</button>
+    <label for="link">Link Video / Akun</label>
+    <input id="link" type="text" placeholder="Masukkan link YouTube atau akun" />
 
-    <h3>Order Layanan</h3>
-    <select id="service">
-  <option>YouTube Subscribers</option>
-  <option>YouTube Views</option>
-  <option>YouTube Watch Time (Jam Tayang)</option>
-  <option>Instagram Followers</option>
-  <option>TikTok Followers</option>
-</select>
-    <input type="number" id="qty" placeholder="Jumlah (misal 100)">
-    <button onclick="order()">Order Sekarang</button>
+    <label for="quantity">Jumlah Pesanan</label>
+    <input id="quantity" type="number" value="100" min="10" onchange="updateTotal()" />
 
-    <div class="msg" id="msg">Saldo: Rp<span id="saldo">20000</span></div>
+    <label for="price">Harga per 1000</label>
+    <input id="price" type="text" value="Rp10.000" readonly />
+
+    <label for="total">Total Bayar</label>
+    <input id="total" type="text" value="Rp1.000" readonly />
+
+    <button onclick="orderNow()">Order Sekarang</button>
+
+    <div class="result" id="resultMsg"></div>
   </div>
 
   <script>
-    let saldo = 20000;
-    const msg = document.getElementById("msg");
-    const saldoEl = document.getElementById("saldo");
+    const prices = {
+      subscribers: 15000,
+      views: 10000,
+      watchtime: 20000,
+      instagram: 12000,
+      tiktok: 8000
+    };
 
-    function topup() {
-      saldo += 10000;
-      saldoEl.textContent = saldo;
-      msg.textContent = "Saldo bertambah Rp10.000 ✅";
+    function formatRupiah(num) {
+      return "Rp" + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
-    function order() {
-      const qty = parseInt(document.getElementById("qty").value) || 0;
+    function updatePrice() {
       const service = document.getElementById("service").value;
-      const harga = service === "subs" ? 100 : service === "views" ? 50 : 80;
-      const total = harga * qty;
-
-      if (saldo < total) {
-        msg.textContent = "Saldo tidak cukup ❌";
-      } else {
-        saldo -= total;
-        saldoEl.textContent = saldo;
-        msg.textContent = `Order ${qty} ${service} berhasil ✅ (Rp${total})`;
-      }
+      document.getElementById("price").value = formatRupiah(prices[service]) + " / 1000";
+      updateTotal();
     }
+
+    function updateTotal() {
+      const qty = parseInt(document.getElementById("quantity").value);
+      const service = document.getElementById("service").value;
+      const pricePer1000 = prices[service];
+      const total = Math.ceil((qty / 1000) * pricePer1000);
+      document.getElementById("total").value = formatRupiah(total);
+    }
+
+    function orderNow() {
+      const service = document.getElementById("service").options[document.getElementById("service").selectedIndex].text;
+      const link = document.getElementById("link").value;
+      const qty = document.getElementById("quantity").value;
+      const total = document.getElementById("total").value;
+
+      if (!link) {
+        alert("Masukkan link terlebih dahulu!");
+        return;
+      }
+
+      document.getElementById("resultMsg").innerHTML =
+        `✅ Pesanan berhasil dibuat!<br>Layanan: <b>${service}</b><br>Jumlah: <b>${qty}</b><br>Total: <b>${total}</b><br>Link: <a href="${link}" target="_blank">Klik di sini</a>`;
+    }
+
+    updatePrice();
   </script>
 </body>
 </html>
