@@ -3,31 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rahman SMM Panel</title>
+  <title>Rahman SMM Panel v2</title>
   <style>
     body {
       font-family: "Poppins", sans-serif;
-      background: linear-gradient(to bottom, #ffffff, #e6f0ff);
+      background: linear-gradient(to bottom, #ffffff, #e8f1ff);
+      margin: 0;
       text-align: center;
-      padding: 20px;
       color: #222;
     }
-    h1 {
+    header {
       background: #007bff;
       color: white;
-      padding: 15px;
-      border-radius: 10px;
+      padding: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      border-radius: 0 0 15px 15px;
     }
     .card {
       background: white;
       border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       padding: 20px;
-      margin-top: 20px;
-      display: inline-block;
-      text-align: left;
       width: 90%;
       max-width: 400px;
+      margin: 20px auto;
+      text-align: left;
     }
     label {
       display: block;
@@ -37,8 +38,8 @@
     input, select {
       width: 100%;
       padding: 10px;
-      border: 1px solid #ccc;
       border-radius: 8px;
+      border: 1px solid #ccc;
     }
     button {
       width: 100%;
@@ -49,92 +50,143 @@
       border-radius: 8px;
       margin-top: 10px;
       font-weight: bold;
-      cursor: pointer;
     }
-    button:hover {
-      background: #005fcc;
-    }
-    .result {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #007bff;
+    button:hover { background: #005fcc; }
+    .saldo {
+      background: #f2f7ff;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
       font-weight: bold;
+      color: #007bff;
+    }
+    .order-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border-top: 1px solid #ccc;
+      margin-top: 10px;
+      padding-top: 10px;
+    }
+    .order-item {
+      background: #f8faff;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      border: 1px solid #dde5ff;
     }
   </style>
 </head>
 <body>
-  <h1>Rahman SMM Panel 💙</h1>
-  
+  <header>Rahman SMM Panel 💙</header>
+
   <div class="card">
-    <label for="service">Pilih Layanan</label>
-    <select id="service" onchange="updatePrice()">
-      <option value="subscribers">YouTube Subscribers</option>
+    <div class="saldo">Saldo: <span id="saldo">Rp20.000</span></div>
+    <button onclick="topup()">+ Top Up Rp10.000</button>
+  </div>
+
+  <div class="card">
+    <label>Pilih Layanan</label>
+    <select id="layanan" onchange="updateHarga()">
+      <option value="subs">YouTube Subscribers</option>
       <option value="views">YouTube Views</option>
-      <option value="watchtime">YouTube Watch Time (Jam Tayang)</option>
-      <option value="instagram">Instagram Followers</option>
-      <option value="tiktok">TikTok Followers</option>
+      <option value="jam">YouTube Jam Tayang</option>
+      <option value="ig">Instagram Followers</option>
     </select>
 
-    <label for="link">Link Video / Akun</label>
-    <input id="link" type="text" placeholder="Masukkan link YouTube atau akun" />
+    <label>Link Video / Akun</label>
+    <input id="link" placeholder="Masukkan link video atau akun" />
 
-    <label for="quantity">Jumlah Pesanan</label>
-    <input id="quantity" type="number" value="100" min="10" onchange="updateTotal()" />
+    <label>Jumlah Pesanan</label>
+    <input id="jumlah" type="number" value="100" min="10" onchange="hitungTotal()" />
 
-    <label for="price">Harga per 1000</label>
-    <input id="price" type="text" value="Rp10.000" readonly />
+    <label>Harga per 1000</label>
+    <input id="harga" readonly />
 
-    <label for="total">Total Bayar</label>
-    <input id="total" type="text" value="Rp1.000" readonly />
+    <label>Total Bayar</label>
+    <input id="total" readonly />
 
-    <button onclick="orderNow()">Order Sekarang</button>
+    <button onclick="pesan()">Order Sekarang</button>
+  </div>
 
-    <div class="result" id="resultMsg"></div>
+  <div class="card">
+    <h3>Riwayat Pesanan</h3>
+    <div class="order-list" id="riwayat"></div>
   </div>
 
   <script>
-    const prices = {
-      subscribers: 15000,
+    const hargaLayanan = {
+      subs: 15000,
       views: 10000,
-      watchtime: 20000,
-      instagram: 12000,
-      tiktok: 8000
+      jam: 20000,
+      ig: 12000
     };
+    let saldo = 20000;
+    let riwayat = [];
 
     function formatRupiah(num) {
       return "Rp" + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
-    function updatePrice() {
-      const service = document.getElementById("service").value;
-      document.getElementById("price").value = formatRupiah(prices[service]) + " / 1000";
-      updateTotal();
+    function updateHarga() {
+      const l = document.getElementById("layanan").value;
+      document.getElementById("harga").value = formatRupiah(hargaLayanan[l]) + " / 1000";
+      hitungTotal();
     }
 
-    function updateTotal() {
-      const qty = parseInt(document.getElementById("quantity").value);
-      const service = document.getElementById("service").value;
-      const pricePer1000 = prices[service];
-      const total = Math.ceil((qty / 1000) * pricePer1000);
+    function hitungTotal() {
+      const l = document.getElementById("layanan").value;
+      const jumlah = parseInt(document.getElementById("jumlah").value);
+      const total = Math.ceil((jumlah / 1000) * hargaLayanan[l]);
       document.getElementById("total").value = formatRupiah(total);
     }
 
-    function orderNow() {
-      const service = document.getElementById("service").options[document.getElementById("service").selectedIndex].text;
-      const link = document.getElementById("link").value;
-      const qty = document.getElementById("quantity").value;
-      const total = document.getElementById("total").value;
-
-      if (!link) {
-        alert("Masukkan link terlebih dahulu!");
-        return;
-      }
-
-      document.getElementById("resultMsg").innerHTML =
-        `✅ Pesanan berhasil dibuat!<br>Layanan: <b>${service}</b><br>Jumlah: <b>${qty}</b><br>Total: <b>${total}</b><br>Link: <a href="${link}" target="_blank">Klik di sini</a>`;
+    function topup() {
+      saldo += 10000;
+      document.getElementById("saldo").innerText = formatRupiah(saldo);
+      alert("Top up berhasil! Saldo sekarang: " + formatRupiah(saldo));
     }
 
-    updatePrice();
+    function pesan() {
+      const layanan = document.getElementById("layanan").options[document.getElementById("layanan").selectedIndex].text;
+      const link = document.getElementById("link").value;
+      const jumlah = parseInt(document.getElementById("jumlah").value);
+      const total = Math.ceil((jumlah / 1000) * hargaLayanan[document.getElementById("layanan").value]);
+
+      if (!link) return alert("Masukkan link dulu!");
+      if (saldo < total) return alert("Saldo tidak cukup!");
+
+      saldo -= total;
+      document.getElementById("saldo").innerText = formatRupiah(saldo);
+
+      const order = { layanan, link, jumlah, total, waktu: new Date().toLocaleString() };
+      riwayat.push(order);
+      localStorage.setItem("riwayat", JSON.stringify(riwayat));
+      tampilRiwayat();
+      alert("Pesanan berhasil dibuat!");
+    }
+
+    function tampilRiwayat() {
+      const div = document.getElementById("riwayat");
+      div.innerHTML = "";
+      riwayat.forEach(o => {
+        div.innerHTML += `
+          <div class="order-item">
+            <b>${o.layanan}</b><br>
+            ${o.link}<br>
+            Jumlah: ${o.jumlah}<br>
+            Total: ${formatRupiah(o.total)}<br>
+            <small>${o.waktu}</small>
+          </div>
+        `;
+      });
+    }
+
+    // Load awal
+    if (localStorage.getItem("riwayat")) {
+      riwayat = JSON.parse(localStorage.getItem("riwayat"));
+      tampilRiwayat();
+    }
+    updateHarga();
   </script>
 </body>
 </html>
