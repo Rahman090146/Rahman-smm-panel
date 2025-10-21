@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rahman SMM Panel</title>
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(to bottom, #f9f9ff, #e3f2fd);
+      color: #222;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    header {
+      background: #1976d2;
+      color: white;
+      padding: 15px 0;
+      font-size: 1.5em;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .container {
+      margin: 25px auto;
+      max-width: 400px;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+    button {
+      background: #1976d2;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #1565c0;
+    }
+    .msg {
+      margin-top: 10px;
+      color: #0d47a1;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>Rahman SMM Panel 💙</header>
+
+  <div class="container">
+    <h3>Top Up Saldo</h3>
+    <button onclick="topup()">+ Rp10.000</button>
+
+    <h3>Order Layanan</h3>
+    <select id="service">
+      <option value="subs">YouTube Subscribers</option>
+      <option value="views">YouTube Views</option>
+      <option value="igfollow">Instagram Followers</option>
+    </select>
+    <input type="number" id="qty" placeholder="Jumlah (misal 100)">
+    <button onclick="order()">Order Sekarang</button>
+
+    <div class="msg" id="msg">Saldo: Rp<span id="saldo">20000</span></div>
+  </div>
+
+  <script>
+    let saldo = 20000;
+    const msg = document.getElementById("msg");
+    const saldoEl = document.getElementById("saldo");
+
+    function topup() {
+      saldo += 10000;
+      saldoEl.textContent = saldo;
+      msg.textContent = "Saldo bertambah Rp10.000 ✅";
+    }
+
+    function order() {
+      const qty = parseInt(document.getElementById("qty").value) || 0;
+      const service = document.getElementById("service").value;
+      const harga = service === "subs" ? 100 : service === "views" ? 50 : 80;
+      const total = harga * qty;
+
+      if (saldo < total) {
+        msg.textContent = "Saldo tidak cukup ❌";
+      } else {
+        saldo -= total;
+        saldoEl.textContent = saldo;
+        msg.textContent = `Order ${qty} ${service} berhasil ✅ (Rp${total})`;
+      }
+    }
+  </script>
+</body>
+</html>
