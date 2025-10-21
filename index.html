@@ -1,191 +1,251 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rahman SMM Panel v2</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rahman SMM Panel v2 — Login</title>
   <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(to bottom, #ffffff, #e8f1ff);
-      margin: 0;
-      text-align: center;
-      color: #222;
-    }
-    header {
-      background: #007bff;
-      color: white;
-      padding: 20px;
-      font-size: 22px;
-      font-weight: bold;
-      border-radius: 0 0 15px 15px;
-    }
-    .card {
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      padding: 20px;
-      width: 90%;
-      max-width: 400px;
-      margin: 20px auto;
-      text-align: left;
-    }
-    label {
-      display: block;
-      margin: 10px 0 5px;
-      font-weight: bold;
-    }
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      width: 100%;
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    button:hover { background: #005fcc; }
-    .saldo {
-      background: #f2f7ff;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      font-weight: bold;
-      color: #007bff;
-    }
-    .order-list {
-      max-height: 200px;
-      overflow-y: auto;
-      border-top: 1px solid #ccc;
-      margin-top: 10px;
-      padding-top: 10px;
-    }
-    .order-item {
-      background: #f8faff;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 8px;
-      border: 1px solid #dde5ff;
-    }
+    /* Simple clean style */
+    :root{--blue:#007bff;--soft:#f2f7ff;--card:#ffffff}
+    body{font-family:Inter,system-ui,Arial; margin:0; background:linear-gradient(180deg,#f7fbff,#e9f3ff); color:#222}
+    header{background:var(--blue); color:#fff; padding:22px 16px; text-align:center; font-weight:700; border-bottom-left-radius:12px; border-bottom-right-radius:12px;}
+    .wrap{max-width:420px;margin:22px auto;padding:0 16px}
+    .card{background:var(--card); border-radius:12px; box-shadow:0 6px 20px rgba(20,40,80,0.08); padding:18px; margin-bottom:16px}
+    label{display:block; font-weight:600; margin:10px 0 6px}
+    input, select, button{width:100%; box-sizing:border-box; padding:10px 12px; border-radius:8px; border:1px solid #d0d7e6; font-size:15px}
+    button{background:var(--blue); color:#fff; border:0; cursor:pointer; margin-top:12px}
+    .muted{color:#6b7280; font-size:13px}
+    .row{display:flex; gap:10px}
+    .row > *{flex:1}
+    .small{font-size:13px; color:#444}
+    .link{color:var(--blue); cursor:pointer}
+    .saldo{background:var(--soft); padding:10px; border-radius:8px; font-weight:700; color:var(--blue)}
+    .order-list{max-height:240px; overflow:auto; margin-top:8px}
+    .order-item{background:#f8fbff;padding:10px;border-radius:8px;margin-bottom:8px;border:1px solid #e6f0ff}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .hidden{display:none}
+    @media (max-width:420px){header{font-size:20px}}
   </style>
 </head>
 <body>
-  <header>Rahman SMM Panel 💙</header>
+  <header>Rahman SMM Panel v2</header>
 
-  <div class="card">
-    <div class="saldo">Saldo: <span id="saldo">Rp20.000</span></div>
-    <button onclick="topup()">+ Top Up Rp10.000</button>
-  </div>
+  <div class="wrap">
+    <!-- LOGIN / REGISTER CARD -->
+    <div id="authCard" class="card">
+      <div id="authTabs" class="topbar" style="margin-bottom:10px">
+        <div>
+          <button id="tabLogin" style="background:#fff;border:1px solid #d0d7e6;padding:8px 12px;border-radius:8px;cursor:pointer">Login</button>
+          <button id="tabReg" style="background:transparent;border:0;padding:8px 12px;border-radius:8px;cursor:pointer;color:#666">Register</button>
+        </div>
+        <div class="muted">Demo account: <b>user:demo / pass:demo</b></div>
+      </div>
 
-  <div class="card">
-    <label>Pilih Layanan</label>
-    <select id="layanan" onchange="updateHarga()">
-      <option value="subs">YouTube Subscribers</option>
-      <option value="views">YouTube Views</option>
-      <option value="jam">YouTube Jam Tayang</option>
-      <option value="ig">Instagram Followers</option>
-    </select>
+      <!-- LOGIN -->
+      <div id="loginView">
+        <label>Email / Username</label>
+        <input id="loginUser" placeholder="Email atau username (demo)" />
+        <label>Password</label>
+        <input id="loginPass" type="password" placeholder="Password (demo)" />
+        <button onclick="doLogin()">Login</button>
+        <div style="margin-top:8px;text-align:center" class="muted">
+          Belum punya akun? <span class="link" onclick="showRegister()">Daftar</span>
+        </div>
+      </div>
 
-    <label>Link Video / Akun</label>
-    <input id="link" placeholder="Masukkan link video atau akun" />
+      <!-- REGISTER -->
+      <div id="regView" class="hidden">
+        <label>Username</label>
+        <input id="regUser" placeholder="Pilih username" />
+        <label>Email</label>
+        <input id="regEmail" placeholder="Email (opsional)" />
+        <label>Password</label>
+        <input id="regPass" type="password" placeholder="Password" />
+        <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
+          <input id="agree" type="checkbox" style="width:18px;height:18px" />
+          <div class="small">Saya setuju bahwa ini demo (tidak aman untuk produksi)</div>
+        </div>
+        <button onclick="doRegister()">Buat Akun</button>
+        <div style="margin-top:8px;text-align:center" class="muted">
+          Sudah punya akun? <span class="link" onclick="showLogin()">Login</span>
+        </div>
+      </div>
+    </div>
 
-    <label>Jumlah Pesanan</label>
-    <input id="jumlah" type="number" value="100" min="10" onchange="hitungTotal()" />
+    <!-- PANEL (TERPROTEKSI) -->
+    <div id="panelCard" class="card hidden">
+      <div class="topbar" style="margin-bottom:12px">
+        <div>
+          <strong id="welcomeText">Halo</strong>
+          <div class="muted small" id="userEmail"></div>
+        </div>
+        <div style="text-align:right">
+          <div class="saldo" id="saldo">Rp20.000</div>
+          <div style="margin-top:8px">
+            <button onclick="logout()" style="background:#fff;color:#007bff;border:1px solid #d0d7e6;padding:8px 10px;border-radius:8px">Logout</button>
+          </div>
+        </div>
+      </div>
 
-    <label>Harga per 1000</label>
-    <input id="harga" readonly />
+      <label>Pilih Layanan</label>
+      <select id="layanan" onchange="updateHarga()">
+        <option value="subs">YouTube Subscribers</option>
+        <option value="views">YouTube Views</option>
+        <option value="jam">YouTube Jam Tayang</option>
+        <option value="ig">Instagram Followers</option>
+      </select>
 
-    <label>Total Bayar</label>
-    <input id="total" readonly />
+      <label>Link Video / Akun</label>
+      <input id="link" placeholder="Masukkan link YouTube atau akun..." />
 
-    <button onclick="pesan()">Order Sekarang</button>
-  </div>
+      <label>Jumlah Pesanan</label>
+      <input id="jumlah" type="number" value="100" min="1" onchange="hitungTotal()" />
 
-  <div class="card">
-    <h3>Riwayat Pesanan</h3>
-    <div class="order-list" id="riwayat"></div>
+      <label>Harga per 1000</label>
+      <input id="harga" readonly />
+
+      <label>Total Bayar</label>
+      <input id="total" readonly />
+
+      <div class="row" style="margin-top:10px">
+        <button onclick="topup()">+ Rp10.000</button>
+        <button onclick="pesan()" style="background:#0a84ff">Order Sekarang</button>
+      </div>
+    </div>
+
+    <!-- RIWAYAT -->
+    <div id="riwayatCard" class="card hidden">
+      <h3>Riwayat Pesanan</h3>
+      <div class="order-list" id="riwayat"></div>
+    </div>
   </div>
 
   <script>
-    const hargaLayanan = {
-      subs: 15000,
-      views: 10000,
-      jam: 20000,
-      ig: 12000
-    };
-    let saldo = 20000;
-    let riwayat = [];
+    /* ========== SIMPLE AUTH (localStorage) ========== */
+    // default demo user
+    if(!localStorage.getItem('users')){
+      const demo = [{user:'demo', email:'demo@local', pass:'demo'}];
+      localStorage.setItem('users', JSON.stringify(demo));
+    }
+    // session stored
+    function setSession(user){ localStorage.setItem('sessionUser', JSON.stringify(user)); }
+    function getSession(){ return JSON.parse(localStorage.getItem('sessionUser')||'null'); }
+    function clearSession(){ localStorage.removeItem('sessionUser'); }
 
-    function formatRupiah(num) {
-      return "Rp" + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    // tabs
+    const loginView = document.getElementById('loginView');
+    const regView = document.getElementById('regView');
+    const authCard = document.getElementById('authCard');
+    const panelCard = document.getElementById('panelCard');
+    const riwayatCard = document.getElementById('riwayatCard');
+    function showRegister(){ loginView.classList.add('hidden'); regView.classList.remove('hidden'); }
+    function showLogin(){ regView.classList.add('hidden'); loginView.classList.remove('hidden'); }
+
+    document.getElementById('tabLogin').onclick = showLogin;
+    document.getElementById('tabReg').onclick = showRegister;
+
+    function doRegister(){
+      const u = document.getElementById('regUser').value.trim();
+      const e = document.getElementById('regEmail').value.trim();
+      const p = document.getElementById('regPass').value;
+      const agree = document.getElementById('agree').checked;
+      if(!u||!p) return alert('Isi username & password');
+      if(!agree) return alert('Centang persetujuan demo');
+      const users = JSON.parse(localStorage.getItem('users')||'[]');
+      if(users.find(x=>x.user===u)) return alert('Username sudah ada');
+      users.push({user:u,email:e,pass:p});
+      localStorage.setItem('users', JSON.stringify(users));
+      alert('Akun dibuat. Silakan login.');
+      showLogin();
     }
 
-    function updateHarga() {
-      const l = document.getElementById("layanan").value;
-      document.getElementById("harga").value = formatRupiah(hargaLayanan[l]) + " / 1000";
+    function doLogin(){
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value;
+      const users = JSON.parse(localStorage.getItem('users')||'[]');
+      const found = users.find(x => (x.user===u || x.email===u) && x.pass===p);
+      if(!found) return alert('Login gagal: periksa username & password');
+      setSession(found);
+      renderApp();
+    }
+
+    function logout(){
+      clearSession();
+      renderApp();
+    }
+
+    /* ========== PANEL LOGIC ========== */
+    const hargaLayanan = { subs:15000, views:10000, jam:20000, ig:12000 };
+    let saldo = parseInt(localStorage.getItem('saldo')||20000);
+    let riwayat = JSON.parse(localStorage.getItem('riwayat')||'[]');
+
+    function formatR(num){ return 'Rp' + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+    function updateHarga(){
+      const l = document.getElementById('layanan').value;
+      document.getElementById('harga').value = formatR(hargaLayanan[l]) + ' / 1000';
       hitungTotal();
     }
-
-    function hitungTotal() {
-      const l = document.getElementById("layanan").value;
-      const jumlah = parseInt(document.getElementById("jumlah").value);
-      const total = Math.ceil((jumlah / 1000) * hargaLayanan[l]);
-      document.getElementById("total").value = formatRupiah(total);
+    function hitungTotal(){
+      const l = document.getElementById('layanan').value;
+      const jumlah = parseInt(document.getElementById('jumlah').value||0);
+      const total = Math.ceil((jumlah/1000) * hargaLayanan[l]);
+      document.getElementById('total').value = formatR(total);
+    }
+    function topup(){
+      saldo += 10000; localStorage.setItem('saldo', saldo);
+      document.getElementById('saldo').innerText = formatR(saldo);
+      alert('Top up +Rp10.000 berhasil');
+    }
+    function pesan(){
+      const layananText = document.getElementById('layanan').options[document.getElementById('layanan').selectedIndex].text;
+      const link = document.getElementById('link').value.trim();
+      const jumlah = parseInt(document.getElementById('jumlah').value||0);
+      const total = Math.ceil((jumlah/1000) * hargaLayanan[document.getElementById('layanan').value]);
+      if(!link) return alert('Masukkan link video/akun dulu');
+      if(jumlah<=0) return alert('Jumlah harus > 0');
+      if(saldo < total) return alert('Saldo tidak cukup');
+      saldo -= total; localStorage.setItem('saldo', saldo);
+      const order = { layanan: layananText, link, jumlah, total, waktu: new Date().toLocaleString() };
+      riwayat.unshift(order); // newest first
+      localStorage.setItem('riwayat', JSON.stringify(riwayat));
+      renderRiwayat();
+      document.getElementById('saldo').innerText = formatR(saldo);
+      alert('Pesanan berhasil dibuat!');
     }
 
-    function topup() {
-      saldo += 10000;
-      document.getElementById("saldo").innerText = formatRupiah(saldo);
-      alert("Top up berhasil! Saldo sekarang: " + formatRupiah(saldo));
-    }
-
-    function pesan() {
-      const layanan = document.getElementById("layanan").options[document.getElementById("layanan").selectedIndex].text;
-      const link = document.getElementById("link").value;
-      const jumlah = parseInt(document.getElementById("jumlah").value);
-      const total = Math.ceil((jumlah / 1000) * hargaLayanan[document.getElementById("layanan").value]);
-
-      if (!link) return alert("Masukkan link dulu!");
-      if (saldo < total) return alert("Saldo tidak cukup!");
-
-      saldo -= total;
-      document.getElementById("saldo").innerText = formatRupiah(saldo);
-
-      const order = { layanan, link, jumlah, total, waktu: new Date().toLocaleString() };
-      riwayat.push(order);
-      localStorage.setItem("riwayat", JSON.stringify(riwayat));
-      tampilRiwayat();
-      alert("Pesanan berhasil dibuat!");
-    }
-
-    function tampilRiwayat() {
-      const div = document.getElementById("riwayat");
-      div.innerHTML = "";
-      riwayat.forEach(o => {
-        div.innerHTML += `
-          <div class="order-item">
-            <b>${o.layanan}</b><br>
-            ${o.link}<br>
-            Jumlah: ${o.jumlah}<br>
-            Total: ${formatRupiah(o.total)}<br>
-            <small>${o.waktu}</small>
-          </div>
-        `;
+    function renderRiwayat(){
+      const div = document.getElementById('riwayat');
+      div.innerHTML = '';
+      if(riwayat.length===0) div.innerHTML = '<div class="muted">Belum ada pesanan</div>';
+      riwayat.forEach(o=>{
+        const el = document.createElement('div');
+        el.className = 'order-item';
+        el.innerHTML = `<b>${o.layanan}</b><br>${o.link}<br>Jumlah: ${o.jumlah} — Total: ${formatR(o.total)}<br><small class="muted">${o.waktu}</small>`;
+        div.appendChild(el);
       });
     }
 
-    // Load awal
-    if (localStorage.getItem("riwayat")) {
-      riwayat = JSON.parse(localStorage.getItem("riwayat"));
-      tampilRiwayat();
+    function renderApp(){
+      const s = getSession();
+      if(!s){
+        // show auth
+        authCard.classList.remove('hidden');
+        panelCard.classList.add('hidden');
+        riwayatCard.classList.add('hidden');
+      } else {
+        authCard.classList.add('hidden');
+        panelCard.classList.remove('hidden');
+        riwayatCard.classList.remove('hidden');
+        document.getElementById('welcomeText').innerText = `Halo, ${s.user}`;
+        document.getElementById('userEmail').innerText = s.email || '';
+        document.getElementById('saldo').innerText = formatR(saldo);
+        updateHarga();
+        renderRiwayat();
+      }
     }
+
+    // initial load
+    renderApp();
     updateHarga();
   </script>
 </body>
